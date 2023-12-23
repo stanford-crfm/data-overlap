@@ -49,6 +49,7 @@ There are additional optional args:
 
 ## Generating metrics
 
-Run `compute_metrics_from_ngrams.py` to generate metrics.
+Run `compute_metrics_from_ngrams.py` to generate metrics. 
 
+`sample_metrics_file` is a file that contains metrics from the pile for testing any script that takes metrics as input.
 
