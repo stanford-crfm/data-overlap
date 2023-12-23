@@ -19,7 +19,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Running
+## Generating ngrams
+
+Generally we recommend running the script on a small subset of the train data and a small subset of the test set (the `scenario_data` file in the repo)to ensure the script works correctly. There may need to be minor modifications to ensure that the script correctly parses the training data
+
+For the actual test set, we either run on the [HELM scenarios](https://worksheets.codalab.org/bundles/0x21612363f53c46db8c46795b0f4f17b4), which is a subset of the actual benchmarks, or the benchmarks associated with the HELM scenarios [Benchmark Scenarios](https://worksheets.codalab.org/bundles/0x7a683bf1c1ec43519c1b8b1466ff7bcf). For the latter, the memory consumption is considerable and it is recommended you shard the test data.
+
+For parallelization, we generally just recommend sharding on training and/or test data and running multiple threads in parallel. The results can be easily joined together.
 
 ```bash
 
@@ -40,14 +46,9 @@ There are additional optional args:
 --tags tag1 tag2
 ```
 
-## Detailed Instructions
 
-Generally we recommend running the script on a small subset of the train data and a small subset of the test set (the `scenario_data` file in the repo)to ensure the script works correctly. There may need to be minor modifications to ensure that the script correctly parses the training data
+## Generating metrics
 
-For the actual test set, we either run on the [HELM scenarios](https://worksheets.codalab.org/bundles/0x21612363f53c46db8c46795b0f4f17b4), which is a subset of the actual benchmarks, or the benchmarks associated with the HELM scenarios [Benchmark Scenarios](https://worksheets.codalab.org/bundles/0x7a683bf1c1ec43519c1b8b1466ff7bcf). For the latter, the memory consumption is considerable and it is recommended you shard the test data.
-
-For parallelization, we generally just recommend sharding on training and/or test data and running multiple threads in parallel. The results can be easily joined together.
-
-
+Run `compute_metrics_from_ngrams.py` to generate metrics.
 
 
