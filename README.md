@@ -1,4 +1,7 @@
-# Data Overlap Script (no dependencies on HELM)
+# Data Overlap
+
+## Background
+This script computes n-gram overlap between two datasets, generally training and test sets, where the test set are HELM scenarios. After generating n-gram overlap, these results are used to compute metrics, which are aggregated into final results.
 
 
 ## Installation
@@ -20,11 +23,9 @@ pip install -r requirements.txt
 
 ```bash
 
-This needs to be run from the data overlap directory; i.e. cd scripts/data_overlap if you are at the top level HELM folder
-
 Usage:
 
-python [compute_data_overlap_metrics.py OR run_data_overlap_beam.py] --input-data <input_data> --scenario-data <scenario_data> --output-stats <output_stats> --input-format <input_format>
+python compute_data_overlap_metrics.py --input-data <input_data> --scenario-data <scenario_data> --output-stats <output_stats> --input-format <input_format>
 
 For instance, you can call this with The Pile, e.g. have:
     input_data  = 00.jsonl (download https://pile.eleuther.ai/)
@@ -39,15 +40,14 @@ There are additional optional args:
 --tags tag1 tag2
 ```
 
-## Docker
+## Detailed Instructions
 
-To create and run docker image:
+Generally we recommend running the script on a small subset of the train data and a small subset of the test set (the `scenario_data` file in the repo)to ensure the script works correctly. There may need to be minor modifications to ensure that the script correctly parses the training data
 
-    docker build . -t data_overlap_script
-    docker run --input-path=<input-path> --scenario-data=<scenario-data> --output-stats=<output-stats> --input-format=<input-format> --rm -it data_overlap_script:latest 
+For the actual test set, we either run on the [HELM scenarios](https://worksheets.codalab.org/bundles/0x21612363f53c46db8c46795b0f4f17b4), which is a subset of the actual benchmarks, or the benchmarks associated with the HELM scenarios [Benchmark Scenarios](https://worksheets.codalab.org/bundles/0x7a683bf1c1ec43519c1b8b1466ff7bcf). For the latter, the memory consumption is considerable and it is recommended you shard the test data.
 
-example with values:
-    
-    docker run --rm -it data_overlap_script:latest --input-path="input.json" --scenario-data="scenario_data" --output-stats="output_stats" --input-format="the_pile"
+For parallelization, we generally just recommend sharding on training and/or test data and running multiple threads in parallel. The results can be easily joined together.
 
-You'll need some way of providing access to your files for the computation, such as [bind mounts](https://docs.docker.com/storage/bind-mounts/) or [volumes](https://docs.docker.com/storage/volumes/)
+
+
+
