@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Tuple
+from enum import Enum
+
 
 try:
     from light_scenario import LightScenarioKey
@@ -84,3 +86,54 @@ class EntryOverlapNgrams:
     entry_data_overlap_key: EntryDataOverlapKey
 
     overlapping_ngram_counts: List[Tuple[str, int]]
+
+
+
+class PartialOverlapSpec(int, Enum):
+    binary = 0
+    jaccard = 1
+    token = 2
+    def __str__(self):
+        return self.name
+
+@dataclass(frozen=True)
+class FrequencySpec:
+    # Filter ngrams with frequency >= filter_value; 0 means no filter
+    filter_value: int
+    # Whether to apply weight; we'll do inverse frequency
+    weighting: bool
+        
+@dataclass(frozen=True)
+class MetricProtocolSpec:
+    """Specification for how we compute the metric"""
+    
+    partial_overlap_spec: PartialOverlapSpec
+    frequency_spec: FrequencySpec
+        
+@dataclass(frozen=True)
+class OverlapMetric:
+    metric_score: float # use 0/1 for binary, can revise as neded
+    metric_protocol_spec: MetricProtocolSpec
+
+# Output: List[EntryOverlapMetric]
+@dataclass(frozen=True)
+class EntryOverlapMetric:
+    """Dataclass that represents output data overlap stats"""
+
+    entry_data_overlap_key: EntryDataOverlapKey
+
+    overlap_metric: OverlapMetric
+
+@dataclass(frozen=True)
+class AggregateDataOverlapKey:
+    """Key representing the aggregated data overlap stats"""
+    stats_key: DataOverlapStatsKey
+    part: str
+
+@dataclass(frozen=True)
+class AggregateOverlapMetric:
+    """Dataclass representing the aggregated overlap metrics"""
+    aggregate_data_overlap_key: AggregateDataOverlapKey
+    metric_scores: List[float]  # List of scores instead of a single value
+    metric_protocol_spec: MetricProtocolSpec
+

@@ -56,7 +56,6 @@ Run `compute_metrics_from_ngrams.py` to generate metrics.
 ```
 python compute_metrics_from_ngrams.py --ngrams-path 'ngrams_input' --scenario-path 'scenario_data' --out-path 'metrics_output' --filter-path 'filtered_scenarios' --N 13    
 
-For instance, you can call this with The Pile, e.g. have:
     ngrams-path = the ngrams generate from compute_data_overlap_metrics.py
     scenario-data = scenario_data is the same file as used in compute_data_overlap_metrics.py
     out-path = arbitrary output file name, e.g. "output_stats"

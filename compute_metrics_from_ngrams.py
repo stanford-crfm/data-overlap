@@ -9,67 +9,11 @@ from collections import defaultdict
 from typing import List, Tuple
 from dataclasses import dataclass
 
-from data_overlap_spec import DataOverlapStatsKey, EntryOverlapNgrams
+from data_overlap_spec import EntryOverlapNgrams, EntryDataOverlapKey, FrequencySpec, PartialOverlapSpec, MetricProtocolSpec, OverlapMetric,  EntryOverlapMetric
 from light_scenario import ScenarioSpecInstanceIds
 from compute_data_overlap_metrics import load_light_scenarios_from_jsonl
 from common.util import get_tokenizer
 from common.general import asdict_without_nones
-
-from enum import Enum
-
-
-@dataclass(frozen=True)
-class EntryDataOverlapKey:
-    """Unique key representing either the input or references of a single instance in a scenario."""
-
-    stats_key: DataOverlapStatsKey
-    part: str
-    """Either PART_INPUT or PART_REF"""
-    instance_id: str
-
-
-# Input: List[EntryOverlapNgrams]
-@dataclass(frozen=True)
-class EntryOverlapNgrams:
-    """Dataclass that represents output data overlap stats"""
-
-    entry_data_overlap_key: EntryDataOverlapKey
-
-    overlapping_ngram_counts: List[Tuple[str, int]]
-
-
-class PartialOverlapSpec(int, Enum):
-    binary = 0
-    jaccard = 1
-    token = 2
-
-@dataclass(frozen=True)
-class FrequencySpec:
-    # Filter ngrams with frequency >= filter_value; 0 means no filter
-    filter_value: int
-    # Whether to apply weight; we'll do inverse frequency
-    weighting: bool
-        
-@dataclass(frozen=True)
-class MetricProtocolSpec:
-    """Specification for how we compute the metric"""
-    
-    partial_overlap_spec: PartialOverlapSpec
-    frequency_spec: FrequencySpec
-        
-@dataclass(frozen=True)
-class OverlapMetric:
-    metric_score: float # use 0/1 for binary, can revise as neded
-    metric_protocol_spec: MetricProtocolSpec
-
-# Output: List[EntryOverlapMetric]
-@dataclass(frozen=True)
-class EntryOverlapMetric:
-    """Dataclass that represents output data overlap stats"""
-
-    entry_data_overlap_key: EntryDataOverlapKey
-
-    overlap_metric: OverlapMetric
 
 def get_metrics(ngrams_path, scenario_path, out_path, filter_path, N):
 
@@ -101,8 +45,6 @@ def get_metrics(ngrams_path, scenario_path, out_path, filter_path, N):
                 entry_overlap_ngrams_list.append(entry_overlap_ngrams)
         else:
                 entry_overlap_ngrams_list.append(entry_overlap_ngrams)
-
-
 
 
     def merge_entries(entry_overlap_ngrams_list):

@@ -2,72 +2,16 @@ import argparse
 import json
 import cattrs
 import pandas as pd
-from enum import Enum
 import numpy
 from nltk import ngrams
 from collections import defaultdict
 from typing import List, Tuple, Any
 from dataclasses import dataclass
 
-from data_overlap_spec import DataOverlapStats, DataOverlapStatsKey, EntryOverlapNgrams
+from data_overlap_spec import AggregateOverlapMetric, AggregateDataOverlapKey, MetricProtocolSpec, PartialOverlapSpec, FrequencySpec, EntryOverlapMetric
 from compute_data_overlap_metrics import load_light_scenarios_from_jsonl
 from common.util import get_tokenizer
 from common.general import asdict_without_nones
-
-@dataclass(frozen=True)
-class EntryDataOverlapKey:
-    """Unique key representing either the input or references of a single instance in a scenario."""
-
-    stats_key: DataOverlapStatsKey
-    part: str
-    """Either PART_INPUT or PART_REF"""
-    instance_id: str
-
-
-# Input: List[EntryOverlapNgrams]
-@dataclass(frozen=True)
-class EntryOverlapNgrams:
-    """Dataclass that represents output data overlap stats"""
-
-    entry_data_overlap_key: EntryDataOverlapKey
-
-    overlapping_ngram_counts: List[Tuple[str, int]]
-
-
-class PartialOverlapSpec(int, Enum):
-    binary = 0
-    jaccard = 1
-    token = 2
-    def __str__(self):
-        return self.name
-
-@dataclass(frozen=True)
-class FrequencySpec:
-    # Filter ngrams with frequency >= filter_value; 0 means no filter
-    filter_value: int
-    # Whether to apply weight; we'll do inverse frequency
-    weighting: bool
-        
-@dataclass(frozen=True)
-class MetricProtocolSpec:
-    """Specification for how we compute the metric"""
-    
-    partial_overlap_spec: PartialOverlapSpec
-    frequency_spec: FrequencySpec
-        
-@dataclass(frozen=True)
-class OverlapMetric:
-    metric_score: float # use 0/1 for binary, can revise as neded
-    metric_protocol_spec: MetricProtocolSpec
-
-# Output: List[EntryOverlapMetric]
-@dataclass(frozen=True)
-class EntryOverlapMetric:
-    """Dataclass that represents output data overlap stats"""
-
-    entry_data_overlap_key: EntryDataOverlapKey
-
-    overlap_metric: OverlapMetric
 
 def scenario_spec_to_class(scenario_spec) -> str:
     return f"{'.'.join(scenario_spec.class_name.split('.')[-1:])}"     
@@ -87,18 +31,6 @@ metric_protocol_specs_list  = [
     MetricProtocolSpec(PartialOverlapSpec.token, FrequencySpec(10, True))
 ]
 
-@dataclass(frozen=True)
-class AggregateDataOverlapKey:
-    """Key representing the aggregated data overlap stats"""
-    stats_key: DataOverlapStatsKey
-    part: str
-
-@dataclass(frozen=True)
-class AggregateOverlapMetric:
-    """Dataclass representing the aggregated overlap metrics"""
-    aggregate_data_overlap_key: AggregateDataOverlapKey
-    metric_scores: List[float]  # List of scores instead of a single value
-    metric_protocol_spec: MetricProtocolSpec
 
 def aggregate_metrics(path, out_path):
     overlap_metrics_jsons = open(path, "r").readlines()
@@ -133,13 +65,14 @@ def aggregate_metrics(path, out_path):
             stats_key=stats_key,
             part=part
         )
-        aggregate_overlap_metrics.append(
-            AggregateOverlapMetric(
-                aggregate_data_overlap_key=aggregate_key,
-                metric_scores=scores,
-                metric_protocol_spec=metric_protocol_spec
+        if aggregate_key.stats_key.light_scenario_key.split == 'test':
+            aggregate_overlap_metrics.append(
+                AggregateOverlapMetric(
+                    aggregate_data_overlap_key=aggregate_key,
+                    metric_scores=scores,
+                    metric_protocol_spec=metric_protocol_spec
+                )
             )
-        )
 
     def save_metrics_to_jsonl(overlap_metrics: List[AggregateOverlapMetric], filename: str):
         with open(filename, "w") as f:
