@@ -55,8 +55,11 @@ def aggregate_metrics(path, out_path):
 
         # Initialize or append the metric score
         if agg_key not in aggregate_score_dict:
-            aggregate_score_dict[agg_key] = []
-        aggregate_score_dict[agg_key].append(metric_score)
+            if stats_key.light_scenario_key.scenario_spec.class_name == 'helm.benchmark.scenarios.copyright_scenario.CopyrightScenario':
+                continue
+            aggregate_score_dict[agg_key] = [metric_score]
+        else:
+            aggregate_score_dict[agg_key].append(metric_score)
 
     # Convert the aggregated data to AggregateOverlapMetric objects
     aggregate_overlap_metrics = []

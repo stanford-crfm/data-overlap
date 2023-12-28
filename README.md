@@ -58,7 +58,16 @@ python compute_metrics_from_ngrams.py --ngrams-path 'ngrams_input' --scenario-pa
 
     ngrams-path = the ngrams generate from compute_data_overlap_metrics.py
     scenario-data = scenario_data is the same file as used in compute_data_overlap_metrics.py
-    out-path = arbitrary output file name, e.g. "output_stats"
+    out-path = arbitrary output file name, e.g. "output_metrics"
     filter-path = if you want to filter to a subset of the scenarios
     N = n in n-grams
+```
+
+## Aggregating metrics
+
+Run `output_aggregate_metrics.py` to aggregate metrics. 
+```
+python output_aggregate_metrics.py --metrics-path=... --out-path=... 
+    metrics-path is the path to the file from compute_metrics_from_ngrams.py
+    out-path is an arbitrary output file name
 ```
