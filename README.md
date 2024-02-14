@@ -65,9 +65,10 @@ python compute_metrics_from_ngrams.py --ngrams-path 'ngrams_input' --scenario-pa
 
 ## Aggregating metrics
 
-Run `output_aggregate_metrics.py` to aggregate metrics. 
+Run `output_aggregate_metrics.py` and `output_aggregate_metrics_both.py` to aggregate metrics. 
 ```
 python output_aggregate_metrics.py --metrics-path=... --out-path=... 
     metrics-path is the path to the file from compute_metrics_from_ngrams.py
     out-path is an arbitrary output file name
 ```
+
