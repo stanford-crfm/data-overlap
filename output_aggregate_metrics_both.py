@@ -31,6 +31,12 @@ metric_protocol_specs_list  = [
     MetricProtocolSpec(PartialOverlapSpec.token, FrequencySpec(10, True))
 ]
 
+non_weighted_metrics = [
+    MetricProtocolSpec(PartialOverlapSpec.binary, FrequencySpec(0, False)),
+    MetricProtocolSpec(PartialOverlapSpec.jaccard, FrequencySpec(0, False)),
+    MetricProtocolSpec(PartialOverlapSpec.token, FrequencySpec(0, False)),
+]
+
 
 def aggregate_metrics(path, out_path):
     overlap_metrics_jsons = open(path, "r").readlines()
@@ -51,6 +57,9 @@ def aggregate_metrics(path, out_path):
         instance_id = entry_overlap_metric.entry_data_overlap_key.instance_id
         metric_protocol_spec = entry_overlap_metric.overlap_metric.metric_protocol_spec
         metric_score = entry_overlap_metric.overlap_metric.metric_score
+
+        if metric_protocol_spec not in non_weighted_metrics:
+            continue
 
         other_part = 'input'
         if part == 'input':
