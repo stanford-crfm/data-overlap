@@ -45,6 +45,7 @@ def get_scenario_spec_instance_id_dict():
         scenario_spec_instance_id_dict[
             scenario_spec_instance_ids.scenario_spec
         ] = scenario_spec_instance_ids.instance_ids
+    return scenario_spec_instance_id_dict
 
 def get_class_name_to_counts():
     scenario_spec_instance_ids_jsons = read_scenario_spec_instance_ids_json()
@@ -71,3 +72,67 @@ def score_to_key(token_score):
         return 'Clean'
     else:
         return 'Clean'
+
+mapping = {
+    "BabiQA": ["bAbI"],
+    "BBQ": ["BBQ"],
+    "BLiMP": ["BLiMP"],
+    "BOLD": ["BOLD"],
+    "BoolQ": ["BoolQ"],
+    "CivilComments": ["CivilComments"],
+    "Code": ["HumanEval", "APPS"],
+    'Copyright':['Copyright'],
+    "CommonSense": ["CommonSenseQA", "HellaSwag", "PIQA", "SIQA"], 
+    "Disinformation": ["Disinformation - HELM"],
+    "DyckLanguage": ["DyckLanguage"],
+    "EntityDataImputation": ["EntityDataImputation"],
+    "EntityMatching": ["EntityMatching"],
+    "GSM8K": ["GSM8K"],
+    "ICE": ["ICE"],
+    "IMDB": ["IMDB"],
+    "LegalSupport": ["LegalSupport"],
+    "LSAT": ["LSAT"],
+    "MATH": ["MATH"],
+    "MMLU": ["MMLU"],
+    "MSMARCO": ["MS MARCO"],
+    "NarrativeQA": ["NarrativeQA"],
+    "NaturalQA": ["Natural Questions"],
+    "QuAC": ["QuAC"],
+    "RAFT": ["RAFT"],
+    "RealToxicityPrompts": ["RealToxicityPrompts"],
+    "Summarization": ["XSum", "CNN/Daily Mail"],
+    "SyntheticEfficiency": ["SyntheticEfficiency"],
+    "SyntheticReasoning": ["SyntheticReasoning"],
+    "SRN": ["SynetheticReasoningNatural"],
+    "ThePile": ["The Pile"],
+    "TruthfulQA": ["TruthfulQA"],
+    "TwitterAAE": ["TwitterAAE"],
+    "WIKIFact": ["WikiFact"]
+}
+dataset_mapping = {
+    "humaneval": "HumanEval",
+    "apps": "APPS",
+    "xsum-sampled": "XSum",
+    "cnn-dm": "CNN/Daily Mail",
+    'hellaswag': 'HellaSwag',
+    'openbookqa': 'OpenBookQA',
+}
+
+def scenario_spec_to_dataset_name(scenario_spec):
+    """ Get the dataset name from scenario_spec """
+    try:
+        class_name = scenario_spec.class_name.split('.')[-1][:-8]  # Get only the class name, not the full module path
+        key = mapping[class_name]
+        
+        args = scenario_spec.args  # ScenarioSpec args
+        
+        
+        if len(key) == 1:
+            return key[0]
+        
+        dataset = args['dataset_name'] if 'dataset_name' in args else args['dataset']
+        key = dataset_mapping[dataset]
+        return key
+    except Exception as e:
+        print(e)
+        return 'NA'
