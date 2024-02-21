@@ -26,10 +26,11 @@ def load_aggregate_metrics(file_path: str):
     return aggregate_metrics
 
 
+
 def score_to_key(token_score):
     if token_score >= 0.8:
-        return 'Not Clean'
+        return 'Dirty'
     elif token_score >= 0.2:
-        return 'Not Clean'
+        return 'Clean'
     else:
         return 'Clean'
