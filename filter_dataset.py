@@ -68,3 +68,15 @@ with open(f"data/filtered_pile_ngrams_test_only", "w") as f:
         if split != 'test':
             continue
         f.write(f"{json.dumps(asdict_without_nones(entry_overlap_ngrams))}\n")
+with open(f"data/filtered_pile_ngrams_test_13_only", "w") as f:
+    for entry_overlap_ngrams in entry_overlap_ngrams_list:
+        part = entry_overlap_ngrams.entry_data_overlap_key.part
+        scenario_spec = entry_overlap_ngrams.entry_data_overlap_key.stats_key.light_scenario_key.scenario_spec
+        split = entry_overlap_ngrams.entry_data_overlap_key.stats_key.light_scenario_key.split
+        if split != 'test':
+            continue
+        
+        n = entry_overlap_ngrams.entry_data_overlap_key.stats_key.overlap_protocol_spec.n
+        if n != 13:
+            continue
+        f.write(f"{json.dumps(asdict_without_nones(entry_overlap_ngrams))}\n")
