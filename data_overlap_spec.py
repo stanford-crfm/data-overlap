@@ -4,9 +4,9 @@ from enum import Enum
 
 
 try:
-    from light_scenario import LightScenarioKey
+    from light_scenario import LightScenarioKey, LightInstance
 except Exception:
-    from helm.benchmark.data_overlap.light_scenario import LightScenarioKey
+    from helm.benchmark.data_overlap.light_scenario import LightScenarioKey, LightInstance
 
 
 @dataclass(frozen=True)
@@ -136,4 +136,36 @@ class AggregateOverlapMetric:
     aggregate_data_overlap_key: AggregateDataOverlapKey
     metric_scores: List[float]  # List of scores instead of a single value
     metric_protocol_spec: MetricProtocolSpec
+
+
+@dataclass(frozen=True)
+class AnnotatedOverlapPart:
+    """
+    Dataclass annotates a given scenario entry with overlaps
+    """
+    
+    part: str
+        
+    annotated_entry_overlap: List[Tuple[str, int]]
+    """list of (word, count) where (word, count) is the 13-gram that starts with word"""
+        
+    metrics : List[OverlapMetric]
+
+@dataclass(frozen=True)
+class TotalAnnotatedEntryOverlap:
+    """
+    Dataclass annotates a given scenario entry with overlaps
+    """
+    instance: LightInstance
+        
+    stats_key: DataOverlapStatsKey
+        
+    instance_id: str
+        
+        
+    annotated_input_overlap: AnnotatedOverlapPart
+    """list of (word, count) where (word, count) is the 13-gram that starts with word"""
+
+    annotated_ref_overlap: AnnotatedOverlapPart
+    """list of (word, count) where (word, count) is the 13-gram that starts with word"""
 

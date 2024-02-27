@@ -31,8 +31,11 @@ def scenario_spec_to_class(scenario_spec) -> str:
     return scenario_spec.class_name.split('.')[-1][:-8]
 
 
-def read_scenario_spec_instance_ids_json():
-    scenario_spec_instance_ids_json = 'filtered_scenario_spec_instance_ids.json'
+def read_scenario_spec_instance_ids_json(test_only=True):
+    if test_only:
+        scenario_spec_instance_ids_json = 'filtered_scenario_data_new_test_only_ids'
+    else:
+        scenario_spec_instance_ids_json = 'filtered_scenario_spec_instance_ids.json'
     scenario_spec_instance_ids_jsons = open(scenario_spec_instance_ids_json, "r").readlines()
     return scenario_spec_instance_ids_jsons
 
@@ -47,8 +50,8 @@ def get_scenario_spec_instance_id_dict():
         ] = scenario_spec_instance_ids.instance_ids
     return scenario_spec_instance_id_dict
 
-def get_class_name_to_counts():
-    scenario_spec_instance_ids_jsons = read_scenario_spec_instance_ids_json()
+def get_class_name_to_counts(test_only=True):
+    scenario_spec_instance_ids_jsons = read_scenario_spec_instance_ids_json(test_only)
     class_name_to_counts = dict()
     scenario_spec_instance_id_dict = dict()
     for scenario_spec_instance_ids_json in scenario_spec_instance_ids_jsons:
@@ -63,6 +66,38 @@ def get_class_name_to_counts():
         class_name_to_counts[class_name] += len(scenario_spec_instance_ids.instance_ids)
     return class_name_to_counts
 
+def get_dataset_to_counts(test_only=True):
+    scenario_spec_instance_ids_jsons = read_scenario_spec_instance_ids_json(test_only)
+    dataset_name_to_counts = dict()
+    scenario_spec_instance_id_dict = dict()
+    for scenario_spec_instance_ids_json in scenario_spec_instance_ids_jsons:
+        scenario_spec_instance_ids_dict = json.loads(scenario_spec_instance_ids_json)
+        scenario_spec_instance_ids = cattrs.structure(scenario_spec_instance_ids_dict, ScenarioSpecInstanceIds)
+        scenario_spec_instance_id_dict[
+            scenario_spec_instance_ids.scenario_spec
+        ] = scenario_spec_instance_ids.instance_ids
+        class_name = scenario_spec_to_dataset_name(scenario_spec_instance_ids.scenario_spec)
+        if class_name not in dataset_name_to_counts:
+            if class_name == 'Copyright':
+                continue
+            dataset_name_to_counts[class_name] = 0
+        dataset_name_to_counts[class_name] += len(scenario_spec_instance_ids.instance_ids)
+    return dataset_name_to_counts
+
+def scenario_spec_to_dataset_name(scenario_spec):
+    """ Get the dataset name from scenario_spec """
+    class_name = scenario_spec.class_name.split('.')[-1][:-8]  # Get only the class name, not the full module path
+    key = mapping[class_name]
+    
+    args = scenario_spec.args  # ScenarioSpec args
+    
+    
+    if len(key) == 1:
+        return key[0]
+    
+    dataset = args['dataset_name'] if 'dataset_name' in args else args['dataset']
+    key = dataset_mapping[dataset]
+    return key
 
 
 def score_to_key(token_score):
