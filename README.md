@@ -18,6 +18,7 @@ source venv/bin/activate
 # Install requirements
 pip install -r requirements.txt
 ```
+Depending on your training data format, you may need to update [load_documents.py](https://github.com/stanford-crfm/data-overlap/blob/main/load_documents.py) to support that training data format.
 
 ## Generating ngrams
 
