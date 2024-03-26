@@ -31,20 +31,32 @@ For parallelization, we generally just recommend sharding on training and/or tes
 
 Usage:
 
+
 python compute_data_overlap_metrics.py --input-data <input_data> --scenario-data <scenario_data> --output-stats <output_stats> --input-format <input_format>
 
 For instance, you can call this with The Pile, e.g. have:
-    input_data  = 00.jsonl (download https://pile.eleuther.ai/)
+    input_data  = pile_input.json (download more at https://pile.eleuther.ai/)
     scenario_data = (example included with repo, but can use HELM to generate)
     output_stats = arbitrary output file name, e.g. "output_stats"
     input_format = the_pile
 
-If you don't want to output the ngrams that are overlapping in test set to a separate "{output_stats}_ngrams" file, you can pass --no-output-ngrams.
+This will output two files: <output_stats> and <output_stats_ngrams>. Pass the second ngrams file to the later steps.
 
 There are additional optional args:
 --normalization default 
 --tags tag1 tag2
+
 ```
+Example: 
+
+We run the example on `example_input.jsonl` as the sample training data and `scenario_data` as the example scenario data; both are in the repo.
+
+```
+python compute_data_overlap_metrics.py --input-data ./example_input.jsonl --scenario-data ./scenario_data --output-stats output_stats --input-format the_pile --N 13
+
+-> produces "output_stats" and "output_stats_ngrams". "output_stats_ngrams" will be the input for the next example stage. These outputs are also in the repo if you want to directly run these
+```
+
 
 
 ## Generating metrics
@@ -61,7 +73,16 @@ python compute_metrics_from_ngrams.py --ngrams-path 'ngrams_input' --scenario-pa
     out-path = arbitrary output file name, e.g. "output_metrics"
     filter-path = if you want to filter to a subset of the scenarios
     N = n in n-grams
+
 ```
+Example: 
+We take the input `output_stats_ngrams` from the last step (or directly from the repo) and run
+
+```
+python compute_metrics_from_ngrams.py --ngrams-path output_stats_ngrams --scenario-path scenario_data --out-path metrics_output --N 13    
+-> produces metrics_output file for next step
+```
+
 
 ## Aggregating metrics
 
@@ -71,4 +92,14 @@ python output_aggregate_metrics.py --metrics-path=... --out-path=...
     metrics-path is the path to the file from compute_metrics_from_ngrams.py
     out-path is an arbitrary output file name
 ```
+Example: 
+We take the input `metrics_output` from the last step (or directly from the repo) and run
+
+```
+python output_aggregate_metrics.py --metrics-path metrics_output --out-path aggregate_metrics
+python output_aggregate_metrics_both.py --metrics-path metrics_output --out-path aggregate_metrics_both
+
+-> produces aggregate metrics output, aggregate_metrics and aggregate_metrics_both
+```
+
 

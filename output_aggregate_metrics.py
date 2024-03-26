@@ -77,14 +77,14 @@ def aggregate_metrics(path, out_path):
             stats_key=stats_key,
             part=part
         )
-        if aggregate_key.stats_key.light_scenario_key.split == 'test':
-            aggregate_overlap_metrics.append(
-                AggregateOverlapMetric(
-                    aggregate_data_overlap_key=aggregate_key,
-                    metric_scores=scores,
-                    metric_protocol_spec=metric_protocol_spec
-                )
+        # if aggregate_key.stats_key.light_scenario_key.split == 'test':
+        aggregate_overlap_metrics.append(
+            AggregateOverlapMetric(
+                aggregate_data_overlap_key=aggregate_key,
+                metric_scores=scores,
+                metric_protocol_spec=metric_protocol_spec
             )
+        )
 
     def save_metrics_to_jsonl(overlap_metrics: List[AggregateOverlapMetric], filename: str):
         with open(filename, "w") as f:
